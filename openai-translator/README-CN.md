@@ -90,6 +90,11 @@ export OPENAI_API_KEY="sk-xxx"
 python ai_translator/main.py --model_type OpenAIModel --openai_api_key $OPENAI_API_KEY --file_format markdown --book tests/test.pdf --openai_model gpt-3.5-turbo
 ```
 
+```bash
+# 使用 target_language 参数指定目标语言
+export OPENAI_API_KEY="sk-xxx"
+python ai_translator\main.py --model_type OpenAIModel --openai_api_key $OPENAI_API_KEY --file_format markdown --book tests\test.pdf --openai_model gpt-3.5-turbo --target_language "Korean" --output_file_path tests\test_Korean_translated.md
+```
 这是使用 GLM 模型的例子：
 
 ```bash
