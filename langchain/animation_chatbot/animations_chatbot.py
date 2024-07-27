@@ -4,18 +4,30 @@ from langchain_openai import OpenAIEmbeddings
 from langchain.chains import RetrievalQA
 from langchain_openai import ChatOpenAI
 from langchain_community.vectorstores import FAISS
+from langchain.prompts import PromptTemplate
+
 from utils import ArgumentParser
 
 
 def initialize_animations_bot(vector_store_dir: str="real_estates_animation"):
     db = FAISS.load_local(vector_store_dir, OpenAIEmbeddings(), allow_dangerous_deserialization=True)
 
+    prompt_template = """Use the following pieces of context to answer the question at the end.
+        {context}
+        Question: 根据下面的 description: {question}，最相似的动画片是什么？并给出评价
+        Answer:"""
+    prompt = PromptTemplate(
+        template=prompt_template, input_variables=["context", "question"]
+    )
+    chain_type_kwargs = {"prompt": prompt}
+
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=args.temperature)
-    
+
     global ANIMATIONS_BOT
     ANIMATIONS_BOT = RetrievalQA.from_chain_type(llm,
-                                           retriever=db.as_retriever(search_type="similarity_score_threshold",
-                                                                     search_kwargs={"score_threshold": 0.7}))
+                                                 retriever=db.as_retriever(search_type="similarity_score_threshold",
+                                                                           search_kwargs={"score_threshold": 0.7}),
+                                                 chain_type_kwargs=chain_type_kwargs)
     # 返回向量数据库的检索结果
     ANIMATIONS_BOT.return_source_documents = True
 
